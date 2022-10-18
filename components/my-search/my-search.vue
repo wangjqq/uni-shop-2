@@ -1,6 +1,7 @@
 <template>
-  <view class="my-search-container">
-    <view class="my-search-box">
+  <view class="my-search-container" :style="{'background-color':bgcolor}" @click="searchBoxHandler">
+    <view class="my-search-box" :style="{'border-radius':radius+'px'}">
+      <!-- 使用uni-ui提供的图标组件 -->
       <uni-icons type="search" size="17"></uni-icons>
       <text class="placeholder">搜索</text>
     </view>
@@ -9,18 +10,35 @@
 
 <script>
   export default {
+    props: {
+      // 背景颜色
+      bgcolor: {
+        type: String,
+        default: '#007AFF'
+      },
+      // 圆角尺寸
+      radius: {
+        type: Number,
+        default: 18 //px
+      }
+    },
     name: "my-search",
     data() {
       return {
 
       };
+    },
+    methods: {
+      searchBoxHandler() {
+        this.$emit('click')
+      }
     }
   }
 </script>
 
 <style lang="scss">
   .my-search-container {
-    background-color: #C00000;
+    // background-color: #C00000;
     height: 50px;
     padding: 0 10px;
     display: flex;
@@ -29,7 +47,7 @@
     .my-search-box {
       height: 36px;
       background-color: #fff;
-      border-radius: 15px;
+      // border-radius: 15px;
       width: 100%;
       display: flex;
       align-items: center;
