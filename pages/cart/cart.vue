@@ -10,7 +10,7 @@
     </view>
     <uni-swipe-action>
       <block v-for="(goods,i) in cart" :key="i">
-        <uni-swipe-action-item :right-options="options" @click="swipeAcitonClickHandler(goods)">
+        <uni-swipe-action-item :right-options="options" @click="swipeAcitonClickHandler(goods)" :auto-close="false">
           <my-goods :goods="goods" :show-radio="true" @radio-change="radioChangerHandler"
             @num-change="numberChangeHandler">
           </my-goods>

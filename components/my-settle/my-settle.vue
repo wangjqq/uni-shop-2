@@ -9,7 +9,7 @@
       合计:<text class="amount">￥{{checkedGoodsAmount}}</text>
     </view>
     <!-- 结算按钮 -->
-    <view class="btn-settle">
+    <view class="btn-settle" @click="settlement">
       结算({{checkedCount}})
     </view>
   </view>
@@ -18,18 +18,24 @@
 <script>
   import {
     mapGetters,
-    mapMutations
+    mapMutations,
+    mapState
   } from 'vuex'
 
   export default {
     name: "my-settle",
     data() {
       return {
-
+        // 倒计时的秒数
+        seconds: 3,
+        // 定时器的id
+        timer: null
       };
     },
     computed: {
       ...mapGetters('m_cart', ['checkedCount', 'total', 'checkedGoodsAmount']),
+      ...mapGetters('m_user', ['addstr']),
+      ...mapState('m_user', ['token']),
       // 是否全选
       ifFullCheck() {
         return this.total === this.checkedCount
@@ -37,8 +43,49 @@
     },
     methods: {
       ...mapMutations('m_cart', ['updateAllGoodsState']),
+      ...mapMutations('m_user', ['updateRedirectInfo']),
       changeAllState() {
         this.updateAllGoodsState(!this.ifFullCheck)
+      },
+      // 用户点击结算按钮
+      settlement() {
+        if (!this.checkedCount) return uni.$showMsg('请选择要结算的商品!')
+        if (!this.addstr) return uni.$showMsg('请选择收货地址')
+        // if (!this.token) return uni.$showMsg('请先登录!')
+        if (!this.token) return this.delayNavigate()
+
+      },
+      // 展示倒计时的提示消息
+      showTips(n) {
+        uni.showToast({
+          icon: 'none',
+          title: '请登录后再结算! ' + n + '秒后自动跳转到登录页',
+          mask: true,
+          duration: 1500
+        })
+      },
+      // 延时导航到my页面
+      delayNavigate() {
+        this.showTips(this.seconds)
+        this.timer = setInterval(() => {
+          this.seconds--
+          if (this.seconds <= 0) {
+            clearInterval(this.timer)
+            this.seconds = 3
+            uni.switchTab({
+              url: '/pages/my/my',
+              success: () => {
+                this.updateRedirectInfo({
+                  openType: 'switchTab',
+                  from: '/pages/cart/cart'
+                })
+              }
+            })
+
+            return
+          }
+          this.showTips(this.seconds)
+        }, 1000)
       }
     }
   }
